@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  flask-backend:
+    build: ./backend_files
+    container_name: flask-backend
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+  streamlit-frontend:
+    build: ./frontend_files
+    container_name: streamlit-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://flask-backend:5000
+    depends_on:
+      - flask-backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
