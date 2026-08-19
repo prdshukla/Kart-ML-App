@@ -16,9 +16,8 @@ def predict_single():
         # Pass payload as a single-row DataFrame/array
         df = pd.DataFrame([data])
         
-        # prediction = model.predict(df)[0]
-        prediction = 0.85  # Mock output
-
+        prediction = model.predict(df)[0]
+        
         return jsonify({'prediction': prediction}), 200
     except Exception as e:
         return jsonify({'error': f'Inference failed: {str(e)}'}), 500
@@ -43,9 +42,8 @@ def predict_batch():
         # Vectorized batch processing
         df = pd.DataFrame(instances)
         
-        # predictions = model.predict(df).tolist()
-        predictions = [0.85] * len(instances)  # Mock output
-
+        predictions = model.predict(df).tolist()
+        
         return jsonify({'predictions': predictions}), 200
     except Exception as e:
         return jsonify({'error': f'Batch processing failed: {str(e)}'}), 500
