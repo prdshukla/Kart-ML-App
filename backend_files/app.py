@@ -1,4 +1,3 @@
-
 # Import necessary libraries
 import numpy as np
 import joblib  # For loading the serialized model
@@ -8,21 +7,19 @@ from flask import Flask, request, jsonify  # For creating the Flask API
 # Initialize Flask app with a name
 superkart_api = Flask("SuperKartSalesAPI")
 
-# Load the trained churn prediction model
-# model = joblib.load("backend_files/xgb_tuned_model.joblib")
+# Load the trained model
 model = joblib.load("xgb_tuned_model.joblib")
+
 # Define a route for the home page
 @superkart_api.get('/')
 def home():
     return "Welcome to the SuperKart Sales Prediction API!"
 
-# Define an endpoint to predict churn for a single customer
+# Define an endpoint to predict sales for a single item
 @superkart_api.post('/v1/predict')
 def predict_sales():
-    # Get JSON data from the request
     data = request.get_json()
 
-    # Extract relevant customer features from the input data. The order of the column names matters.
     sample = {
         'Product_Weight': data['Product_Weight'],
         'Product_Sugar_Content': data['Product_Sugar_Content'],
@@ -36,16 +33,11 @@ def predict_sales():
         'Product_Type_Category': data['Product_Type_Category']
     }
 
-    # Convert the extracted data into a DataFrame
     input_data = pd.DataFrame([sample])
-
-    # Make a churn prediction using the trained model
     prediction = model.predict(input_data).tolist()[0]
 
-    # Return the prediction as a JSON response
     return jsonify({'Sales': prediction})
 
-
-# Run the Flask app in debug mode
 if __name__ == '__main__':
-    superkart_api.run(debug=True)
+    # BIND TO 0.0.0.0 TO ALLOW DOCKER & CODESPACES REVERSE PROXY ACCESS
+    superkart_api.run(host='0.0.0.0', port=5000, debug=True)
