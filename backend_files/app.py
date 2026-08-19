@@ -1,7 +1,11 @@
 from flask import Flask, request, jsonify
 import pandas as pd
+import joblib  # or your preferred model loading library
 
 superkart_api = Flask(__name__)
+
+# Load model globally once on startup
+# model = joblib.load('model.pkl') 
 
 # ------------------------------------------------------------------
 # Single Inference Endpoint
@@ -13,12 +17,11 @@ def predict_single():
         return jsonify({'error': 'Missing request payload'}), 400
 
     try:
-        # Pass payload as a single-row DataFrame/array
         df = pd.DataFrame([data])
-        
         prediction = model.predict(df)[0]
         
-        return jsonify({'prediction': prediction}), 200
+        # Convert numpy types to native Python types for JSON serialization if needed
+        return jsonify({'prediction': float(prediction)}), 200
     except Exception as e:
         return jsonify({'error': f'Inference failed: {str(e)}'}), 500
 
@@ -39,11 +42,16 @@ def predict_batch():
         return jsonify({'error': '"instances" must be a non-empty list'}), 400
 
     try:
-        # Vectorized batch processing
         df = pd.DataFrame(instances)
-        
         predictions = model.predict(df).tolist()
         
         return jsonify({'predictions': predictions}), 200
     except Exception as e:
         return jsonify({'error': f'Batch processing failed: {str(e)}'}), 500
+
+
+# ------------------------------------------------------------------
+# Server Runner
+# ------------------------------------------------------------------
+if __name__ == '__main__':
+    superkart_api.run(host='0.0.0.0', port=5000, debug=True)
