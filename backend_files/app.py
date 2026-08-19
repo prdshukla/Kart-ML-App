@@ -5,7 +5,7 @@ import joblib  # or your preferred model loading library
 superkart_api = Flask(__name__)
 
 # Load model globally once on startup
-# model = joblib.load('model.pkl') 
+model = joblib.load('xgb_tuned_model') 
 
 # ------------------------------------------------------------------
 # Single Inference Endpoint
